@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jesus.coupons.beans.UserBean;
 import com.jesus.coupons.beans.UserLoginDetails;
 import com.jesus.coupons.data.SuccessfulLoginData;
-import com.jesus.coupons.entities.User;
 import com.jesus.coupons.exceptions.ApplicationException;
 import com.jesus.coupons.logic.UsersController;
 
@@ -48,13 +47,13 @@ public class UsersApi {
 
 	
 	@GetMapping("{userId}")
-	public User getUser(@PathVariable("userId") long userId) throws ApplicationException {
+	public UserBean getUser(@PathVariable("userId") long userId) throws ApplicationException {
 		return this.usersController.getUser(userId);
 	}
 
 
 	@GetMapping()
-	public List<User> getAllUsers() throws ApplicationException {
+	public List<UserBean> getAllUsers() throws ApplicationException {
 		return this.usersController.getAllUsers();
 	}
 

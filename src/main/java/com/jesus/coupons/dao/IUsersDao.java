@@ -6,7 +6,10 @@ import com.jesus.coupons.entities.User;
 
 
 public interface IUsersDao extends CrudRepository<User, Long> {
+	
+	public void deleteByUsername(String username);
 
+	public User findByUsername(String username);
 	
 	public boolean existsByUsername(String username);
 	

@@ -74,10 +74,9 @@ public class SuccessfulLoginData {
 
 	@Override
 	public String toString() {
-		return "SuccessfulLoginDetails [token=" + token + ", userType=" + userType + ", firstName=" + firstName
+		return "SuccessfulLoginData [token=" + token + ", userType=" + userType + ", firstName=" + firstName
 				+ ", lastName=" + lastName + "]";
 	}
-
 
 
 }

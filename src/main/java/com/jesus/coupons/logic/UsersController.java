@@ -1,5 +1,6 @@
 package com.jesus.coupons.logic;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import com.jesus.coupons.beans.UserLoginDetails;
 import com.jesus.coupons.dao.IUsersDao;
 import com.jesus.coupons.data.SuccessfulLoginData;
 import com.jesus.coupons.data.UserLoginData;
+import com.jesus.coupons.entities.Company;
 import com.jesus.coupons.entities.User;
 import com.jesus.coupons.enums.ErrorTypes;
 import com.jesus.coupons.enums.UserTypes;
@@ -50,6 +52,8 @@ public class UsersController {
 		
 		//Hashing the password and replacing it with the current one
 		user.setPassword(String.valueOf(user.getPassword().hashCode()));
+		
+		System.out.println(user);
 		try {
 			this.usersDao.save(user);
 		} catch (Exception e) {
@@ -76,7 +80,6 @@ public class UsersController {
 
 	private User createUserFromUserBean(UserBean userBean) {
 		User user = new User();
-		user.setCompany(userBean.getCompany());
 		user.seteMail(userBean.geteMail());
 		user.setFirstName(userBean.getFirstName());
 		user.setId(userBean.getId());
@@ -84,16 +87,22 @@ public class UsersController {
 		user.setPassword(userBean.getPassword());
 		user.setUsername(userBean.getUsername());
 		user.setUserType(userBean.getUserType());
+		if (userBean.getUserType().equals(UserTypes.COMPANY)) {
+			user.setCompany(new Company());
+			user.getCompany().setId(userBean.getCompanyId());		
+		}
+		else {
+			user.setCompany(null);
+		}
 		return user;
 	}
 
 
 	public void userValidations(User user) throws ApplicationException {
-		User existingUser = null;
+		UserBean existingUserBean = null;
 
 		try {
-
-			existingUser = this.getUser(user.getId());	
+			existingUserBean = this.getUser(user.getId());	
 		} catch (ApplicationException e) {
 
 			//Allowing the null user through, we handle it later
@@ -103,24 +112,24 @@ public class UsersController {
 				throw e;
 			}
 		}
-
+		
 		//The null check is intended for when a user is created, so we avoid a null pointer exception
 		//that wouldv'e occurred on the second check.
 		//The second check is intended for updating a user. If the user isn't changing its name,
 		//we must allow it to keep its name, and therefore we skip the name check.
-		if (existingUser == null || !user.getUsername().equals(existingUser.getUsername())) {
+		if (existingUserBean == null || !user.getUsername().equals(existingUserBean.getUsername())) {
 			if (this.usersDao.existsByUsername(user.getUsername())) {
 				throw new ApplicationException(ErrorTypes.INVALID_USERNAME, "Username already taken.");
 			}
 		}
 		
-		if (existingUser == null || !user.geteMail().equals(existingUser.geteMail())) {
+		if (existingUserBean == null || !user.geteMail().equals(existingUserBean.geteMail())) {
 			if (this.usersDao.existsByEMail(user.geteMail())) {
 				throw new ApplicationException(ErrorTypes.INVALID_EMAIL, "E-mail already in use.");
 			}
 		}
 		
-		if (existingUser != null && !existingUser.getPassword().equals(String.valueOf(user.getPassword().hashCode()))) {
+		if (existingUserBean != null && !existingUserBean.getPassword().equals(String.valueOf(user.getPassword().hashCode()))) {
 			passwordValidations(user.getPassword());
 		}
 
@@ -137,7 +146,7 @@ public class UsersController {
 
 
 	public void deleteUser(long userId) throws ApplicationException {
-		User user = this.getUser(userId);
+		UserBean user = this.getUser(userId);
 
 		//If the user is a customer, we redirect it to the customer controller
 		//so it will handle the deletion of both user and customer entities
@@ -153,9 +162,10 @@ public class UsersController {
 	}
 
 
-	public User getUser(long id) throws ApplicationException {
+	public UserBean getUser(long id) throws ApplicationException {
 		try {
-			return this.usersDao.findById(id).get();
+			User user = this.usersDao.findById(id).get();
+			return createUserBeanFromUser(user);
 		} catch (Exception e) {
 			if (e.getCause() == null) {
 				throw new ApplicationException(ErrorTypes.INVALID_USER, "User not found");
@@ -163,6 +173,22 @@ public class UsersController {
 			throw new ApplicationException(e, ErrorTypes.GENERAL_ERROR, "Failed to get user");
 		}
 	
+	}
+
+
+	private UserBean createUserBeanFromUser(User user) {
+		UserBean userBean = new UserBean();
+		userBean.setUsername(user.getUsername());
+		userBean.setPassword(user.getPassword());
+		userBean.seteMail(user.geteMail());
+		userBean.setId(user.getId());
+		userBean.setFirstName(user.getFirstName());
+		userBean.setLastName(user.getLastName());
+		userBean.setUserType(user.getUserType());
+		if (user.getUserType().equals(UserTypes.COMPANY)) {
+			userBean.setCompanyId(user.getCompany().getId());
+		}
+		return userBean;
 	}
 
 
@@ -208,7 +234,7 @@ public class UsersController {
 	}
 
 
-	public List<User> getAllUsers() throws ApplicationException {
+	public List<UserBean> getAllUsers() throws ApplicationException {
 		List<User> users;
 		try {
 			users = (List<User>) this.usersDao.findAll();
@@ -221,7 +247,12 @@ public class UsersController {
 		if (users.isEmpty()) {
 			throw new ApplicationException(ErrorTypes.INVALID_USER, "Users not found");
 		}
-		return users;
+		
+		List<UserBean> usersBean = new ArrayList<>();
+		for (User user : users) {
+			usersBean.add(createUserBeanFromUser(user));
+		}
+		return usersBean;
 	}
 
 

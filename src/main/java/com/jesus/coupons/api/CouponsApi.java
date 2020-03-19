@@ -56,6 +56,13 @@ public class CouponsApi {
 	public Coupon getCoupon(@PathVariable("couponId") long couponId) throws ApplicationException {
 		return this.couponsController.getCoupon(couponId);
 	}
+	
+	
+	@GetMapping("/getMyCompanyCoupons")
+	public List<Coupon> getMyCompanyCoupons(HttpServletRequest request) throws ApplicationException {
+		UserLoginData userData = (UserLoginData) request.getAttribute("userLoginData");
+		return this.couponsController.findCouponsByCompanyId(userData.getCompanyId());
+	}
 
 
 	@GetMapping

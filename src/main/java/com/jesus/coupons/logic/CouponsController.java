@@ -58,7 +58,7 @@ public class CouponsController {
 
 
 	private void couponValidations(Coupon coupon) throws ApplicationException {
-		Coupon existingCoupon = new Coupon();
+		Coupon existingCoupon = null;
 
 		try {
 
@@ -87,8 +87,12 @@ public class CouponsController {
 			throw new ApplicationException(ErrorTypes.INVALID_PRICE, "Price must be greater than 0.");
 		}
 		
-		Date today = new Date(Calendar.getInstance().getTime().getTime());;
-		if (existingCoupon == null && coupon.getStartDate().compareTo(today) < 0) {
+
+		Date today = new Date(Calendar.getInstance().getTime().getTime());
+		
+		if ((existingCoupon == null || 
+				!coupon.getStartDate().toString().equals(existingCoupon.getStartDate().toString())) &&
+				coupon.getStartDate().compareTo(today) < 0) {
 			throw new ApplicationException(ErrorTypes.INVALID_START_DATE, "Start date has already passed.");
 		}
 		

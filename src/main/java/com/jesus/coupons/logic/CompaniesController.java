@@ -5,9 +5,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import com.jesus.coupons.beans.CreateCompany;
+import com.jesus.coupons.beans.UserBean;
 import com.jesus.coupons.dao.ICompaniesDao;
 import com.jesus.coupons.entities.Company;
 import com.jesus.coupons.enums.ErrorTypes;
+import com.jesus.coupons.enums.UserTypes;
 import com.jesus.coupons.exceptions.ApplicationException;
 
 
@@ -17,18 +20,29 @@ public class CompaniesController {
 	
 	@Autowired
 	private ICompaniesDao companiesDao;
-
-
+	
+	@Autowired
+	private UsersController usersController;
+	
+	
 	public CompaniesController() {
 	}
 
-
-	public void createCompany(Company company) throws ApplicationException {
-		companyValidations(company);
+	
+	public void createCompany(CreateCompany createCompany) throws ApplicationException {
+		companyValidations(createCompany.getCompany());
+		Company company = null;
 		try {
-			this.companiesDao.save(company);
-
+			company = this.companiesDao.save(createCompany.getCompany());
+			UserBean user = createCompany.getUser();
+			user.setUserType(UserTypes.COMPANY);
+			user.setCompanyId(company.getId());
+			this.usersController.createUser(user);
 		} catch (Exception e) {
+			if (e instanceof ApplicationException) {
+				deleteCompany(company.getId());
+				throw e;
+			}
 			throw new ApplicationException(e, ErrorTypes.GENERAL_ERROR, "Failed to create new company");
 		}
 	}

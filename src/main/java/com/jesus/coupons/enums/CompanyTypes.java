@@ -2,6 +2,7 @@ package com.jesus.coupons.enums;
 
 public enum CompanyTypes {
 
-	A,
-	B
+	FOOD,
+	TOURISM,
+	ELECTRONICS
 }

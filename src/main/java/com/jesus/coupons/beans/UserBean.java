@@ -1,6 +1,5 @@
 package com.jesus.coupons.beans;
 
-import com.jesus.coupons.entities.Company;
 import com.jesus.coupons.enums.UserTypes;
 
 
@@ -24,7 +23,7 @@ public class UserBean {
 
 	private UserTypes userType;
 
-	private Company company;
+	private long companyId;
 
 
 	//--------Constructors-----------------------------------------------------------------
@@ -108,21 +107,21 @@ public class UserBean {
 	}
 
 
-	public Company getCompany() {
-		return company;
+	public long getCompanyId() {
+		return companyId;
 	}
 
 
-	public void setCompany(Company company) {
-		this.company = company;
+	public void setCompanyId(long companyId) {
+		this.companyId = companyId;
 	}
 
-	
+
 	@Override
 	public String toString() {
-		return "UserBean [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", EMail=" + eMail
-				+ ", username=" + username + ", password=" + password + ", userType=" + userType + ", company="
-				+ company + "]";
+		return "UserBean [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", eMail=" + eMail
+				+ ", username=" + username + ", password=" + password + ", userType=" + userType + ", companyId="
+				+ companyId + "]";
 	}
 
 	

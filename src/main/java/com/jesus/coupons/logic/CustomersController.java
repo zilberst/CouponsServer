@@ -76,7 +76,9 @@ public class CustomersController {
 
 	public Customer getCustomer(long customerId) throws ApplicationException {
 		try {
-			return this.customersDao.findById(customerId).get();
+			Customer customer = this.customersDao.findById(customerId).get();
+			customer.getUser().setPassword("");
+			return customer;
 		} catch (Exception e) {
 			if (e.getCause() == null) {
 				throw new ApplicationException(ErrorTypes.INVALID_CUSTOMER, "Customer not found");

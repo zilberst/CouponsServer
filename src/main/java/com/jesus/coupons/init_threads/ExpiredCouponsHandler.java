@@ -39,14 +39,14 @@ public class ExpiredCouponsHandler implements Runnable {
 				//Since the current hour is 00, there is no point in checking the hour every minute.
 				//Therefore, raising the sleep timer to 22 hours for a single loop.
 				try {
-					Thread.sleep(1000*60*60*22);
+					Thread.sleep(79200000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
 			else {
 				try {
-					Thread.sleep(1000*60);
+					Thread.sleep(60000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
